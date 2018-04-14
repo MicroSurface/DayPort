@@ -8,8 +8,10 @@ import {
   Text,
   View
 } from 'react-native';
+import HomePageService from '../Services/HomePageService';
+var homePageService = new HomePageService();
 
-var dataList = ["a", "b", "c", "d","a", "b", "c", "d","a", "b", "c", "d","a", "b", "c", "d"];
+var dataList = '';
 
 export default class DayPort extends Component {
   constructor(props){
@@ -31,14 +33,20 @@ export default class DayPort extends Component {
   }
 
   async getHomePageData(){
-    this.setState({statistics:dataList, refreshing:false});
+    var homePageResult = await homePageService.getHomePageData();
+    if (homePageResult.status == 200 && homePageResult.success){
+      let result = homePageResult.responseData;
+      this.setState({statistics:result, refreshing:false});
+    }else{
+      this.setState({refreshing:false});
+    }
   }
 
   _renderRow(rowData, sectionId, rowId){
     return(
       <TouchableOpacity>
         <View style={styles.listViewStyle}>
-          <Text style={styles.titleName}>{rowData}</Text>
+          <Text style={styles.titleName}>{rowData.topic_source}</Text>
         </View>
       </TouchableOpacity>
     )
@@ -55,8 +63,9 @@ export default class DayPort extends Component {
                 tintColor={'#ff0000'}
                 title={'下拉刷新'}
                 onRefresh={() => this.getHomePageData()} />}
-            dataSource={this.state.dataSource.cloneWithRowsAndSections(this.state.statistics)}
-            renderRow={(rowData, sectionId, rowId) => this._renderRow(rowData, sectionId, rowId)}>
+            dataSource={this.state.dataSource.cloneWithRows(this.state.statistics)}
+            renderRow={(rowData, sectionId, rowId) => this._renderRow(rowData, sectionId, rowId)}
+            enableEmptySections={true}>
           </ListView>
         </View>
       </View>

@@ -1,13 +1,22 @@
-var express = require('express');
-var mySql = require('mySql');
 
-var app = express();
+var privateHeaders = {
+	'X-LC-Id':'xzF4HavabiRfEU2eKvLnvpU9-gzGzoHsz',
+    'X-LC-Key':'YpykRlmTqtTSlLA1t32SywUt',
+    'Content-Type':'application/json',
+}
 
-var dataList = { "1":{id:1,name:"test"},"2":{id:2,name:"test"}}
+export default class HomePageService {
+	async getHomePageData(){
+		let url = "http://localhost:8888/info";
+		let map = {};
+		map.method = "GET";
+		// map.headers = privateHeaders;
 
-app.get('/info', function(req, res){
-	res.set({'Content-Type':'text/json','Encodeing':'utf8'});
-	res.send(dataList)
-})
-
-app.listen(8888);
+		let result = {};
+		result.response = await fetch(url, map);
+		result.responseData = await result.response.json();
+		result.status = result.response.status;
+		result.success = result.response.ok;
+		return result;
+	}
+}
